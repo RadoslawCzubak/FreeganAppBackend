@@ -6,7 +6,6 @@ from passlib.context import CryptContext
 from jose import JWTError, jwt
 
 # temporary key
-from freegan_app.api.dependencies.dependencies import get_db_repository
 from freegan_app.api.schemas.user_schema import User
 from freegan_app.db.db_repository import DbRepository
 
@@ -65,8 +64,8 @@ def create_token_for_user(db_repo: DbRepository, email: str, password: str) -> U
         return AuthError.WRONG_CREDENTIALS
     return create_access_token(
         {
-            "sub": user.id,
-            "email": user.email
+            "sub": str(user.id),
+            "email": str(user.email)
         }
     )
 
@@ -89,15 +88,19 @@ def check_password_strength(password: str):
     return len(password) >= 8
 
 
-def get_current_user(token: str, db_repo: DbRepository = Depends(get_db_repository)) -> Union[User, int]:
+def get_current_user(token: str, db_repo: DbRepository) -> Union[User, int]:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id: int = payload.get("sub")
+        print(payload)
+        user_id: int = int(payload.get("sub"))
+        print(user_id)
         if user_id is None:
             return AuthError.UNAUTHORIZED
     except JWTError:
+        print(JWTError.with_traceback())
         return AuthError.UNAUTHORIZED
     user = db_repo.get_user_by_id(user_id)
     if user is None:
         return AuthError.UNAUTHORIZED
+    print(user)
     return user

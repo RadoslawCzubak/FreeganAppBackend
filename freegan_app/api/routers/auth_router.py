@@ -1,18 +1,19 @@
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
 from starlette import status
 
 import freegan_app.domain.auth as auth
 from ..schemas.auth_schema import Token
-from ..schemas.user_schema import LoginUserPostRequest, RegisterUserPostRequest
+from ..schemas.user_schema import RegisterUserPostRequest
 from ..dependencies.dependencies import get_db_repository
 
 router = APIRouter(prefix="/user", tags=["Authorization"])
 
 
 @router.post("/token", response_model=Token)
-async def login_user_for_token(user: LoginUserPostRequest, db=Depends(get_db_repository)):
-    token = auth.create_token_for_user(db, user.email, user.password)
-    if not token:
+async def login_user_for_token(user: OAuth2PasswordRequestForm = Depends(), db=Depends(get_db_repository)):
+    token = auth.create_token_for_user(db, user.username, user.password)
+    if token == auth.AuthError.WRONG_CREDENTIALS:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
