@@ -4,7 +4,7 @@ from starlette import status
 
 import freegan_app.domain.auth as auth
 from ..schemas.auth_schema import Token
-from ..schemas.user_schema import RegisterUserPostRequest
+from ..schemas.user_schema import RegisterUserPostRequest, User
 from ..dependencies.dependencies import get_db_repository
 
 router = APIRouter(prefix="/user", tags=["Authorization"])
@@ -22,7 +22,7 @@ async def login_user_for_token(user: OAuth2PasswordRequestForm = Depends(), db=D
     return Token(access_token=token, token_type="Bearer")
 
 
-@router.post("/register")
+@router.post("/register", response_model=User)
 async def register_user(user: RegisterUserPostRequest, db=Depends(get_db_repository)):
     result = auth.create_new_user(db, email=user.email, password=user.password)
     if result == auth.AuthError.USER_EXISTS:
