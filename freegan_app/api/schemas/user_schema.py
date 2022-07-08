@@ -18,6 +18,10 @@ class RegisterUserPostResponse(UserBase):
     is_verified: bool = False
 
 
+class VerifyUserRequest(UserBase):
+    verification_code: str
+
+
 class User(UserBase):
     id: int
     password_hashed: str

@@ -1,3 +1,5 @@
+from sqlalchemy.orm import Session
+
 from freegan_app.db.database import SessionLocal
 from freegan_app.db.model.user import User
 
@@ -5,7 +7,7 @@ from freegan_app.db.model.user import User
 class DbRepository:
 
     def __init__(self, db: SessionLocal):
-        self.db = db
+        self.db: Session = db
 
     def get_user_by_email(self, email: str):
         return self.db.query(User).filter(User.email == email).first()
@@ -19,6 +21,11 @@ class DbRepository:
 
     def get_user_by_id(self, user_id: int):
         return self.db.query(User).filter(User.id == user_id).first()
+
+    def set_user_verification_status(self, user_id, is_verified):
+        self.db.query(User).filter(User.id == user_id).update({"is_verified": is_verified})
+        self.db.commit()
+        return
 
     def close(self):
         self.db.close()

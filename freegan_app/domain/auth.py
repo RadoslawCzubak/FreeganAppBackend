@@ -65,6 +65,8 @@ def create_token_for_user(db_repo: DbRepository, email: str, password: str) -> U
     user = authenticate_user(db_repo, email, password)
     if not user:
         return AuthError.WRONG_CREDENTIALS
+    if not user.is_verified:
+        return AuthError.USER_INACTIVE
     return create_access_token(
         {
             "sub": str(user.id),
@@ -115,3 +117,13 @@ def get_current_user(token: str, db_repo: DbRepository) -> Union[User, int]:
         return AuthError.UNAUTHORIZED
     print(user)
     return user
+
+
+def verify_user(db_repo, email: str, verification_code: str):
+    user = get_user(db_repo, email)
+    if not user:
+        return AuthError.WRONG_CREDENTIALS
+    if int(verification_code) != int(user.verification_code):
+        return AuthError.WRONG_CREDENTIALS
+    db_repo.set_user_verification_status(user.id, True)
+    return

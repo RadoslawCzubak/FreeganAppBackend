@@ -4,7 +4,7 @@ from starlette import status
 
 import freegan_app.domain.auth as auth
 from ..schemas.auth_schema import Token
-from ..schemas.user_schema import RegisterUserPostRequest, RegisterUserPostResponse
+from ..schemas.user_schema import RegisterUserPostRequest, RegisterUserPostResponse, VerifyUserRequest
 from ..dependencies.dependencies import get_db_repository
 from freegan_app.api.email_verification.email_sender import send_verification_email
 
@@ -20,7 +20,25 @@ async def login_user_for_token(user: OAuth2PasswordRequestForm = Depends(), db=D
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    if token == auth.AuthError.USER_INACTIVE:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User is not verified",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     return Token(access_token=token, token_type="Bearer")
+
+
+@router.post("/verify")
+async def verify_user(user_info: VerifyUserRequest, db=Depends(get_db_repository)):
+    result = auth.verify_user(db, user_info.email, user_info.verification_code)
+    if result == auth.AuthError.WRONG_CREDENTIALS:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect verification code",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return
 
 
 @router.post("/register", response_model=RegisterUserPostResponse)
