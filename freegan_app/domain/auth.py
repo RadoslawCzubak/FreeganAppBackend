@@ -1,7 +1,9 @@
 from datetime import timedelta, datetime
 from typing import Union
 
-from fastapi import Depends
+import random
+
+from dotenv import dotenv_values
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 
@@ -9,7 +11,8 @@ from jose import JWTError, jwt
 from freegan_app.api.schemas.user_schema import User
 from freegan_app.db.db_repository import DbRepository
 
-SECRET_KEY = "7bb30c52ce98dbd26fe3dd2550360eff3bdd6f15d052a005510445fd85aa3ce7"
+env_config = dotenv_values('freegan_app/.env')
+SECRET_KEY = env_config['PASSWORD_HASH_SECRET']
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -77,11 +80,19 @@ def create_new_user(db_repo: DbRepository, email: str, password: str) -> Union[U
     if not check_password_strength(password):
         return AuthError.PASSWORD_TOO_WEAK
     password_hashed = get_password_hash(password)
-    return db_repo.create_new_user(email, password_hashed)
+    code = generate_verification_code(6)
+    return db_repo.create_new_user(email, password_hashed, str(code))
 
 
 def get_password_hash(password):
     return pwd_context.hash(password)
+
+
+def generate_verification_code(n_digits: int):
+    verification_code = ""
+    for i in range(n_digits):
+        verification_code += str(random.randint(0, 9))
+    return verification_code
 
 
 def check_password_strength(password: str):

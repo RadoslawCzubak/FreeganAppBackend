@@ -4,8 +4,9 @@ from starlette import status
 
 import freegan_app.domain.auth as auth
 from ..schemas.auth_schema import Token
-from ..schemas.user_schema import RegisterUserPostRequest, User
+from ..schemas.user_schema import RegisterUserPostRequest, RegisterUserPostResponse
 from ..dependencies.dependencies import get_db_repository
+from freegan_app.api.email_verification.email_sender import send_verification_email
 
 router = APIRouter(prefix="/user", tags=["Authorization"])
 
@@ -22,7 +23,7 @@ async def login_user_for_token(user: OAuth2PasswordRequestForm = Depends(), db=D
     return Token(access_token=token, token_type="Bearer")
 
 
-@router.post("/register", response_model=User)
+@router.post("/register", response_model=RegisterUserPostResponse)
 async def register_user(user: RegisterUserPostRequest, db=Depends(get_db_repository)):
     result = auth.create_new_user(db, email=user.email, password=user.password)
     if result == auth.AuthError.USER_EXISTS:
@@ -37,4 +38,5 @@ async def register_user(user: RegisterUserPostRequest, db=Depends(get_db_reposit
             detail="Password too weak.",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    return result
+    send_verification_email(result.email, result.verification_code)
+    return RegisterUserPostResponse(id=result.id, email=result.email, is_verified=result.is_verified)

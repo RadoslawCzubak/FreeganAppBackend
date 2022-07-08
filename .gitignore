@@ -121,3 +121,4 @@ __pycache__/
 *.py[cod]
 *.db
 secrets.py
+.env
