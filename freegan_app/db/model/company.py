@@ -7,6 +7,7 @@ class Company(Base):
 
     id = Column(Integer, index=True, primary_key=True)
     name = Column(String)
+    address = Column(String)
     lat = Column(Float)
     lon = Column(Float)
     user_id = Column(Integer, ForeignKey('user.id'))

@@ -104,18 +104,14 @@ def check_password_strength(password: str):
 def get_current_user(token: str, db_repo: DbAuthRepository) -> Union[User, int]:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        print(payload)
         user_id: int = int(payload.get("sub"))
-        print(user_id)
         if user_id is None:
             return AuthError.UNAUTHORIZED
     except JWTError:
-        print(JWTError.with_traceback())
         return AuthError.UNAUTHORIZED
     user = db_repo.get_user_by_id(user_id)
     if user is None:
         return AuthError.UNAUTHORIZED
-    print(user)
     return user
 
 

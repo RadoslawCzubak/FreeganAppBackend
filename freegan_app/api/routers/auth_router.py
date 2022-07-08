@@ -5,14 +5,14 @@ from starlette import status
 import freegan_app.domain.auth as auth
 from ..schemas.auth_schema import Token
 from ..schemas.user_schema import RegisterUserPostRequest, RegisterUserPostResponse, VerifyUserRequest
-from ..dependencies.dependencies import get_db_repository
+from ..dependencies.dependencies import get_db_auth_repository
 from freegan_app.api.email_verification.email_sender import send_verification_email
 
 router = APIRouter(prefix="/user", tags=["Authorization"])
 
 
 @router.post("/token", response_model=Token)
-async def login_user_for_token(user: OAuth2PasswordRequestForm = Depends(), db=Depends(get_db_repository)):
+async def login_user_for_token(user: OAuth2PasswordRequestForm = Depends(), db=Depends(get_db_auth_repository)):
     token = auth.create_token_for_user(db, user.username, user.password)
     if token == auth.AuthError.WRONG_CREDENTIALS:
         raise HTTPException(
@@ -30,7 +30,7 @@ async def login_user_for_token(user: OAuth2PasswordRequestForm = Depends(), db=D
 
 
 @router.post("/verify")
-async def verify_user(user_info: VerifyUserRequest, db=Depends(get_db_repository)):
+async def verify_user(user_info: VerifyUserRequest, db=Depends(get_db_auth_repository)):
     result = auth.verify_user(db, user_info.email, user_info.verification_code)
     if result == auth.AuthError.WRONG_CREDENTIALS:
         raise HTTPException(
@@ -42,7 +42,7 @@ async def verify_user(user_info: VerifyUserRequest, db=Depends(get_db_repository
 
 
 @router.post("/register", response_model=RegisterUserPostResponse)
-async def register_user(user: RegisterUserPostRequest, db=Depends(get_db_repository)):
+async def register_user(user: RegisterUserPostRequest, db=Depends(get_db_auth_repository)):
     result = auth.create_new_user(db, email=user.email, password=user.password)
     if result == auth.AuthError.USER_EXISTS:
         raise HTTPException(
