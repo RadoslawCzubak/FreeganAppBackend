@@ -5,6 +5,14 @@ class CompanyError:
     COMPANY_EXISTS = 1
     INVALID_NAME = 2
     INVALID_COORDS = 3
+    NOT_EXISTS = 4
+
+
+def get_company(db_repo: DbCompanyRepository, user_id: int):
+    company = db_repo.get_company_by_owner(user_id)
+    if not company:
+        return CompanyError.NOT_EXISTS
+    return company
 
 
 def create_new_company(db_repo: DbCompanyRepository, name: str, address: str, lat: float, lon: float, user_id: int):
