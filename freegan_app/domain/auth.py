@@ -9,7 +9,7 @@ from jose import JWTError, jwt
 
 # temporary key
 from freegan_app.api.schemas.user_schema import User
-from freegan_app.db.db_repository import DbRepository
+from freegan_app.db.repository.db_auth_repository import DbAuthRepository
 
 env_config = dotenv_values('freegan_app/.env')
 SECRET_KEY = env_config['PASSWORD_HASH_SECRET']
@@ -36,7 +36,7 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-def get_user(db_repo: DbRepository, email):
+def get_user(db_repo: DbAuthRepository, email):
     return db_repo.get_user_by_email(email)
 
 
@@ -61,7 +61,7 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     return encoded_jwt
 
 
-def create_token_for_user(db_repo: DbRepository, email: str, password: str) -> Union[int, str]:
+def create_token_for_user(db_repo: DbAuthRepository, email: str, password: str) -> Union[int, str]:
     user = authenticate_user(db_repo, email, password)
     if not user:
         return AuthError.WRONG_CREDENTIALS
@@ -75,7 +75,7 @@ def create_token_for_user(db_repo: DbRepository, email: str, password: str) -> U
     )
 
 
-def create_new_user(db_repo: DbRepository, email: str, password: str) -> Union[User, int]:
+def create_new_user(db_repo: DbAuthRepository, email: str, password: str) -> Union[User, int]:
     user = get_user(db_repo, email)
     if user:
         return AuthError.USER_EXISTS
@@ -101,7 +101,7 @@ def check_password_strength(password: str):
     return len(password) >= 8
 
 
-def get_current_user(token: str, db_repo: DbRepository) -> Union[User, int]:
+def get_current_user(token: str, db_repo: DbAuthRepository) -> Union[User, int]:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         print(payload)

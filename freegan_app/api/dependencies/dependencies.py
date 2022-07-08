@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordBearer
 from starlette import status
 
 from freegan_app.db.database import SessionLocal
-from freegan_app.db.db_repository import DbRepository
+from freegan_app.db.repository.db_auth_repository import DbAuthRepository
 from freegan_app.domain import auth
 from freegan_app.domain.auth import AuthError
 
@@ -11,7 +11,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/token")
 
 
 def get_db_repository():
-    db = DbRepository(SessionLocal())
+    db = DbAuthRepository(SessionLocal())
     try:
         yield db
     finally:

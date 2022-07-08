@@ -4,8 +4,7 @@ from freegan_app.db.database import SessionLocal
 from freegan_app.db.model.user import User
 
 
-class DbRepository:
-
+class DbAuthRepository:
     def __init__(self, db: SessionLocal):
         self.db: Session = db
 
