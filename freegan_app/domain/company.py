@@ -21,7 +21,7 @@ def create_new_company(db_repo: DbCompanyRepository, name: str, address: str, la
         return CompanyError.COMPANY_EXISTS
     if len(name) == 0:
         return CompanyError.INVALID_NAME
-    if is_lat_valid(lat) and is_lon_valid(lon):
+    if not is_lat_valid(lat) or not is_lon_valid(lon):
         return CompanyError.INVALID_COORDS
     return db_repo.create_new_company(name, address, lat, lon, user_id)
 
