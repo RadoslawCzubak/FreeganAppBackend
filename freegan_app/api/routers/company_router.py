@@ -5,6 +5,8 @@ import freegan_app.domain.company as company
 from freegan_app.api.dependencies import dependencies
 from freegan_app.api.dependencies.dependencies import check_token_and_return_user
 from freegan_app.api.schemas.company_schema import CreateCompanyPostRequest, Company
+from freegan_app.api.schemas.offer_schema import CreateOfferRequest
+from freegan_app.db.repository.db_company_repository import DbCompanyRepository
 
 router = APIRouter(prefix="/company", tags=["Company"])
 
@@ -43,6 +45,38 @@ async def create_new_company(new_company: CreateCompanyPostRequest, user=Depends
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Incorrect coordinates.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return result
+
+
+@router.post('/offer')
+async def create_new_offer(offer: CreateOfferRequest, user=Depends(check_token_and_return_user),
+                           db: DbCompanyRepository = Depends(dependencies.get_db_company_repository)):
+    result = company.create_offer(db, offer, user.id)
+    if result == company.CompanyError.NOT_EXISTS:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User have not company.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    if result == company.CompanyError.CREATE_OFFER_ERROR:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot create offer.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return result
+
+
+@router.get('/offer')
+async def get_my_offer(cmp=Depends(dependencies.check_user_and_return_company),
+                       db: DbCompanyRepository = Depends(dependencies.get_db_company_repository)):
+    result = company.get_latest_company_offer(db, cmp.id)
+    if result == company.CompanyError.NOT_EXISTS:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Offer not found.",
             headers={"WWW-Authenticate": "Bearer"},
         )
     return result
