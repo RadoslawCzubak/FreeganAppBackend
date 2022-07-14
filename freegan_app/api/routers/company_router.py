@@ -30,7 +30,7 @@ async def create_new_company(new_company: CreateCompanyPostRequest, user=Depends
     if result == company.CompanyError.COMPANY_EXISTS:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="Incorrect username or password",
+            detail="User is the owner already.",
             headers={"WWW-Authenticate": "Bearer"},
         )
     if result == company.CompanyError.INVALID_NAME:
