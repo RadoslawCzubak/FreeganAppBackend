@@ -4,8 +4,8 @@ from sqlalchemy import desc
 from sqlalchemy.orm import Session
 
 from freegan_app.api.schemas.offer_schema import CreateOfferRequest
-from freegan_app.db.model.company import Company
-from freegan_app.db.model.offer import Offer, Product
+from freegan_app.data.model.company_model import Company
+from freegan_app.data.model.offer_model import Offer, Product
 
 
 class DbCompanyRepository:

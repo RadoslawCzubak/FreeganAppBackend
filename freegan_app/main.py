@@ -3,7 +3,7 @@ from fastapi import FastAPI, Depends
 from freegan_app import docs
 from freegan_app.api.dependencies.dependencies import check_token_and_return_user
 from freegan_app.api.routers import auth_router, company_router
-from freegan_app.db.database import create_db_tables
+from freegan_app.data.database import create_db_tables
 
 create_db_tables()
 

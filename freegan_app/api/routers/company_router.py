@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
 
-import freegan_app.domain.company as company
+import freegan_app.core.company as company
 from freegan_app.api.dependencies import dependencies
 from freegan_app.api.dependencies.dependencies import check_token_and_return_user
 from freegan_app.api.schemas.company_schema import CreateCompanyPostRequest, Company
 from freegan_app.api.schemas.offer_schema import CreateOfferRequest
-from freegan_app.db.repository.db_company_repository import DbCompanyRepository
+from freegan_app.data.repository.db_company_repository import DbCompanyRepository
 
 router = APIRouter(prefix="/company", tags=["Company"])
 

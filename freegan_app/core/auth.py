@@ -9,7 +9,7 @@ from jose import JWTError, jwt
 
 # temporary key
 from freegan_app.api.schemas.user_schema import User
-from freegan_app.db.repository.db_auth_repository import DbAuthRepository
+from freegan_app.data.repository.db_auth_repository import DbAuthRepository
 
 env_config = dotenv_values('freegan_app/.env')
 SECRET_KEY = env_config['PASSWORD_HASH_SECRET']

@@ -1,5 +1,5 @@
 from freegan_app.api.schemas.offer_schema import CreateOfferRequest
-from freegan_app.db.repository.db_company_repository import DbCompanyRepository
+from freegan_app.data.repository.db_company_repository import DbCompanyRepository
 
 
 class CompanyError:

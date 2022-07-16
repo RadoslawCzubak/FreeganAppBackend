@@ -3,11 +3,11 @@ from fastapi.security import OAuth2PasswordBearer
 from starlette import status
 
 from freegan_app.api.schemas.user_schema import User
-from freegan_app.db.database import SessionLocal
-from freegan_app.db.repository.db_auth_repository import DbAuthRepository
-from freegan_app.db.repository.db_company_repository import DbCompanyRepository
-from freegan_app.domain import auth, company
-from freegan_app.domain.auth import AuthError
+from freegan_app.data.database import SessionLocal
+from freegan_app.data.repository.db_auth_repository import DbAuthRepository
+from freegan_app.data.repository.db_company_repository import DbCompanyRepository
+from freegan_app.core import auth, company
+from freegan_app.core.auth import AuthError
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/token")
 

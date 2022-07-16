@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
-from freegan_app.db.database import SessionLocal
-from freegan_app.db.model.user import User
+from freegan_app.data.database import SessionLocal
+from freegan_app.data.model.user_model import User
 
 
 class DbAuthRepository:

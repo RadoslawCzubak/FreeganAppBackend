@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from starlette import status
 
-import freegan_app.domain.auth as auth
+import freegan_app.core.auth as auth
 from ..schemas.auth_schema import Token
 from ..schemas.user_schema import RegisterUserPostRequest, RegisterUserPostResponse, VerifyUserRequest
 from ..dependencies.dependencies import get_db_auth_repository
